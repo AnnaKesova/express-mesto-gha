@@ -19,12 +19,12 @@ module.exports.getUserById = (req, res) => {
   User.findById({ _id: id })
     .then((user) => {
       if (!user) {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
+        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
       } else { res.send(user); }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
         return;
       }
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
@@ -35,7 +35,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(201);
+      //res.status(201);
       res.send(user);
     })
     .catch((err) => {
