@@ -15,7 +15,7 @@ module.exports.getUser = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   const { id } = req.params;
-  User.find({ _id: id })
+  User.findById({ _id: id })
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
