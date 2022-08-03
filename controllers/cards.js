@@ -59,11 +59,11 @@ module.exports.likeCard = (req, res) => {
         res
           .status(ERROR_NOT_FOUND.status)
           .send({ message: ERROR_NOT_FOUND.message });
-      } else if (err.name === 'ValidationError') {
+      } else if (err.name === 'CastError') {
         res
           .status(ERROR_CODE.status)
           .send({ message: ERROR_CODE.message });
-      } else { res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });}
+      } else { res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message }); }
     });
 };
 
