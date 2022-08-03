@@ -8,11 +8,7 @@ const {
 module.exports.getUser = (req, res) => {
   User.find({})
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
+    .catch(() => {
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
     });
 };
@@ -27,7 +23,7 @@ module.exports.getUserById = (req, res) => {
       } res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
         return;
       }
@@ -62,8 +58,8 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
+          .status(ERROR_NOT_FOUND.status)
+          .send({ message: ERROR_NOT_FOUND.message });
         return;
       }
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
