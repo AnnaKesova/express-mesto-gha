@@ -15,7 +15,7 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params.userId;
   User.findById({ _id: id })
     .then((user) => {
       if (!user) {
@@ -36,7 +36,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      //res.status(SUCCESS_STATUS);
+      res.status(201);
       res.send(user);
     })
     .catch((err) => {
