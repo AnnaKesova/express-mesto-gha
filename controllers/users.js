@@ -20,7 +20,12 @@ module.exports.getUser = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { id } = req.params;
   User.find({ _id: id })
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+        return;
+      } res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
