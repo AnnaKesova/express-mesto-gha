@@ -19,7 +19,7 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-      } else { res.send(user); }
+      } else { res.send({ data: user }); }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
