@@ -52,7 +52,13 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
+      } else {
+        res.send(card);
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
