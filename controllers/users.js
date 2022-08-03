@@ -15,13 +15,11 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  const { id } = req.params.userId;
-  User.findById({ _id: id })
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-        return;
-      } res.send({ data: user });
+      } else { res.send(user); }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
