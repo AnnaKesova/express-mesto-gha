@@ -5,7 +5,7 @@ const ERROR_CODE = {
 
 const ERROR_NOT_FOUND = {
   status: 404,
-  message: 'Карточка или пользователь не найден',
+  message: 'Карточка, страница или пользователь не найден',
 };
 
 const ERROR_DEFAULT = {
