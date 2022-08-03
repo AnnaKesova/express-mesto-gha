@@ -52,21 +52,18 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-      } else {
-        res.send({ data: card });
-      }
-    })
+    .orFail(new Error('NonExistentCard'))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.statusCode === ERROR_NOT_FOUND) {
+        res
+          .status(ERROR_NOT_FOUND.status)
+          .send({ message: ERROR_NOT_FOUND.message });
+      } else if (err.name === 'ValidationError') {
         res
           .status(ERROR_CODE.status)
           .send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+      } else { res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });}
     });
 };
 
