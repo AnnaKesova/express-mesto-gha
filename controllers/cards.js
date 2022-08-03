@@ -3,7 +3,7 @@ const {
   ERROR_CODE,
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
-} = require('../utils/errorCodes');
+} = require('../utils/utils');
 
 module.exports.getCard = (req, res) => {
   Card.find({})

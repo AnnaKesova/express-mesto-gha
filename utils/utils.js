@@ -13,8 +13,13 @@ const ERROR_DEFAULT = {
   message: 'Ошибка по-умолчанию',
 };
 
+const SUCCESS_STATUS = {
+  status: 201,
+};
+
 module.exports = {
   ERROR_CODE,
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
+  SUCCESS_STATUS,
 };

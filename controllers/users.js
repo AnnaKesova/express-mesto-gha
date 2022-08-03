@@ -3,7 +3,8 @@ const {
   ERROR_CODE,
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
-} = require('../utils/errorCodes');
+  SUCCESS_STATUS,
+} = require('../utils/utils');
 
 module.exports.getUser = (req, res) => {
   User.find({})
@@ -35,6 +36,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
+      res.status(SUCCESS_STATUS);
       res.send(user);
     })
     .catch((err) => {

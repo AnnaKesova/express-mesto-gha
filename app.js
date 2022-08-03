@@ -5,7 +5,7 @@ const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const {
   ERROR_NOT_FOUND,
-} = require('./utils/errorCodes');
+} = require('./utils/utils');
 
 const { PORT = 3000 } = process.env;
 
