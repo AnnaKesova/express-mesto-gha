@@ -59,8 +59,8 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(ERROR_NOT_FOUND.status)
-          .send({ message: ERROR_NOT_FOUND.message });
+          .status(ERROR_CODE.status)
+          .send({ message: ERROR_CODE.message });
         return;
       }
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
@@ -77,8 +77,8 @@ module.exports.updateAvatarUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(ERROR_NOT_FOUND.status)
-          .send({ message: ERROR_NOT_FOUND.message });
+          .status(ERROR_CODE.status)
+          .send({ message: ERROR_CODE.message });
         return;
       }
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
