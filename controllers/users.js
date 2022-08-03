@@ -17,11 +17,8 @@ module.exports.getUser = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { id } = req.params;
   User.findById({ _id: id })
-    .then((user) => {
-      if (!user) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-      } else { res.send(user); }
-    })
+    .orFail(new Error('NonExistentUser'))
+    .then((user) => res.send(user[0]))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
