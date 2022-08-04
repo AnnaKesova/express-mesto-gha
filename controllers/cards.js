@@ -34,8 +34,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { id } = req.params;
-  Card.findByIdAndRemove(id)
+  Card.findByIdAndRemove(req.params.cardId)
     .orFail(new Error('NonExistentCard'))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
