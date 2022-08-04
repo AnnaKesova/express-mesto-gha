@@ -23,7 +23,7 @@ module.exports.getUserById = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
         return;
       }
