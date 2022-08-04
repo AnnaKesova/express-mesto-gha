@@ -53,7 +53,7 @@ module.exports.deleteCard = (req, res) => {
 
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
@@ -75,20 +75,22 @@ module.exports.likeCard = (req, res) => {
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NonExistentCard'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+      } else {
+        res.send(card);
+      }
+    })
     .catch((err) => {
-      if (err.statusCode === ERROR_NOT_FOUND) {
-        res.status(ERROR_NOT_FOUND.status)
-          .send({ message: ERROR_NOT_FOUND.message });
-      } else if (err.name === 'CastError') {
-        res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
-      } else { res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message }); }
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
+        return;
+      }
+      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
     });
 };
