@@ -16,17 +16,16 @@ module.exports.getUser = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { id } = req.params;
   User.findById(id)
-    .then((user) => {
-      if (!user) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-      } else { res.send({ data: user }); }
-    })
+    .orFail(new Error('NonExistentCard'))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+      if (err.statusCode === ERROR_NOT_FOUND) {
+        res.status(ERROR_NOT_FOUND.status)
+          .send({ message: ERROR_NOT_FOUND.message });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_CODE.status)
+          .send({ message: ERROR_CODE.message });
+      } else { res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message }); }
     });
 };
 
