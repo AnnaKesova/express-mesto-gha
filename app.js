@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+const auth = require('./middlewares/auth');
 const {
   ERROR_NOT_FOUND,
 } = require('./utils/utils');
@@ -35,6 +36,9 @@ app.post('/signup', createUser);
 app.use('/', (req, res) => {
   res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
 });
+
+// авторизация
+app.use(auth);
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb');
