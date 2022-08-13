@@ -6,8 +6,8 @@ const {
 const userRoutes = express.Router();
 
 userRoutes.get('/', getUser);
-userRoutes.get('/:userId', getUserById);
 userRoutes.get('/me', getUserOne);
+userRoutes.get('/:userId', getUserById);
 userRoutes.patch('/me', updateUser);
 userRoutes.patch('/me/avatar', updateAvatarUser);
 

@@ -33,12 +33,12 @@ app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);
 app.post('/signin', login);
 app.post('/signup', createUser);
+// авторизация
+app.use(auth);
+
 app.use('/', (req, res) => {
   res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
 });
-
-// авторизация
-app.use(auth);
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb');
