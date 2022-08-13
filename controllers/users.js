@@ -120,8 +120,8 @@ module.exports.login = (req, res) => {
 };
 
 module.exports.getUserOne = (req, res) => {
-  User.find({})
-    .then((user) => res.send(user))
+  User.findOne({ _id: req.user._id })
+    .then((user) => res.send({ data: user }))
     .catch(() => {
       res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
     });
