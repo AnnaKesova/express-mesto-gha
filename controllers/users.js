@@ -118,3 +118,11 @@ module.exports.login = (req, res) => {
         .send({ message: err.message });
     });
 };
+
+module.exports.getUserOne = (req, res) => {
+  User.find({})
+    .then((user) => res.send(user))
+    .catch(() => {
+      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+    });
+};
