@@ -7,6 +7,9 @@ const cardRoutes = require('./routes/cards');
 const {
   ERROR_NOT_FOUND,
 } = require('./utils/utils');
+const {
+  createUser, login,
+} = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 
@@ -27,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('/', (req, res) => {
   res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
 });
