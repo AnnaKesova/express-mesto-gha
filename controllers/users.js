@@ -5,7 +5,6 @@ const NotFoundError = require('../utils/NotFoundError');
 const BadRequestCode = require('../utils/BadRequestCode');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 const ConflictError = require('../utils/ConflictError');
-const DUPLICATE_EMAIL = require('../utils/utils');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -50,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
           });
         })
         .catch((err) => {
-          if (err.code === DUPLICATE_EMAIL) {
+          if (err.code === 11000) {
             next(new ConflictError('Пользователь с таким email уже существует'));
             return;
           }
