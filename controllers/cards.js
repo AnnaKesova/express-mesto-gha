@@ -1,61 +1,44 @@
 const Card = require('../models/card');
-const {
-  ERROR_CODE,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-} = require('../utils/utils');
+const NotFoundError = require('../utils/NotFoundError');
+const BadRequestCode = require('../utils/BadRequestCode');
+const ForbiddenError = require('../utils/ForbiddenError');
 
-module.exports.getCard = (req, res) => {
+module.exports.getCard = (req, res, next) => {
   Card.find({})
     .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
-    });
+    .catch((err) => { next(err); });
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const id = req.user._id;
   Card.create({ name, link, owner: id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-        return;
+        throw new NotFoundError('Пользователь не найден');
       }
-      if (card.owner.toString() !== req.user._id) {
-        return;
-      }
+      if (card.owner.toString() !== req.user._id) { throw new ForbiddenError('Чужую карточку нельзя удалить'); }
       Card.findByIdAndRemove(req.params.cardId)
         .then(() => res.send(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -63,21 +46,19 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+        throw new NotFoundError('Пользователь не найден');
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -85,16 +66,14 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+        throw new NotFoundError('Пользователь не найден');
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
