@@ -14,20 +14,6 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (user === null) {
-        throw new NotFoundError('Пользователь не найден');
-      } return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestCode('Переданы некорректные данные'));
-      } else { next(err); }
-    });
-};
-
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -44,13 +30,16 @@ module.exports.createUser = (req, res, next) => {
         .then((user) => {
           res.send({
             data: {
-              name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+              email: user.email,
             },
           });
         })
         .catch((err) => {
           if (err.code === 11000) {
-            next(new ConflictError('Пользователь с таким email уже существует'));
+            next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
             return;
           }
           if (err.name === 'ValidationError') {
@@ -59,6 +48,22 @@ module.exports.createUser = (req, res, next) => {
           }
           next(err);
         });
+    });
+};
+
+module.exports.getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь не найден'));
+        return;
+      }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
