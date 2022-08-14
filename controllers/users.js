@@ -34,32 +34,32 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
   bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, // записываем хеш в базу
-    }))
-    .then((user) => {
-      res.send({
-        _id: user._id,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-      });
-    })
-    .catch((err) => {
-      if (err.code === DUPLICATE_EMAIL) {
-        next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
-        return;
-      }
-      if (err.name === 'ValidationError') {
-        next(new BadRequestCode('Переданы некорректные данные'));
-        return;
-      }
-      next(err);
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => {
+          res.send({
+            data: {
+              name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+            },
+          });
+        })
+        .catch((err) => {
+          if (err.code === 11000) {
+            next(new ConflictError('Пользователь с таким email уже существует'[409]));
+            return;
+          }
+          if (err.name === 'ValidationError') {
+            next(new BadRequestCode('Пользователь с таким email уже существует'[400]));
+            return;
+          }
+          next(err);
+        });
     });
 };
 
