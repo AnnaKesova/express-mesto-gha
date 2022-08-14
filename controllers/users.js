@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../utils/NotFoundError');
 const BadRequestCode = require('../utils/BadRequestCode');
 const UnauthorizedError = require('../utils/UnauthorizedError');
+const ConflictError = require('../utils/ConflictError');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -30,6 +31,12 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .then((user) => {
+      if (!user) {
+        throw new ConflictError('Пользователь с данным email уже зарегистрирован');
+      }
+    });
   const {
     name, about, avatar, email, password,
   } = req.body;
