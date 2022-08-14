@@ -42,7 +42,7 @@ app.use(auth);
 
 // роуты, требующие авторизации
 app.use('/cards', auth, cardRoutes);
-app.use('/users', auth, userRoutes);
+app.use('/users', userRoutes);
 
 app.use(errors()); // обработчик ошибок celebrate
 
