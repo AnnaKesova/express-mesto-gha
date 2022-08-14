@@ -31,7 +31,7 @@ app.post('/signin', celebrate({
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().regex(/^(https|http)?:\/\/(www.)?[\w-._~:/?#[\]@!$&'()*+,;=]*#?/),
@@ -42,15 +42,7 @@ app.use(auth);
 
 // роуты, требующие авторизации
 app.use('/cards', auth, cardRoutes);
-app.use('/users',celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email(),
-    password: Joi.string().min(8),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^(https|http)?:\/\/(www.)?[\w-._~:/?#[\]@!$&'()*+,;=]*#?/),
-  }),
-}), userRoutes);
+app.use('/users', auth, userRoutes);
 
 app.use(errors()); // обработчик ошибок celebrate
 
