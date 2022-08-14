@@ -16,19 +16,23 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.id)
-    .then((user) => {
-      if (user === null) { throw new NotFoundError('Пользователь по указанному id не найден'); }
-      return res.send({ data: user });
+  const { userId } = req.params;
+  User.findById(userId)
+    .orFail(() => {
+      // eslint-disable-next-line no-new
+      new NotFoundError('Нет пользователя с таким id');
     })
+    .then((users) => res.send({ data: users }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestCode('Переданы некорректные данные при поиске'));
+        next(new BadRequestCode('Невалидный идентификатор для пользователя'));
       } else {
         next(err);
+        // next(new NotFound('Такого пользователя не существует'));
       }
     });
 };
+
 
 module.exports.createUser = (req, res, next) => {
   const {
