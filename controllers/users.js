@@ -5,6 +5,7 @@ const NotFoundError = require('../utils/NotFoundError');
 const BadRequestCode = require('../utils/BadRequestCode');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 const ConflictError = require('../utils/ConflictError');
+const DUPLICATE_EMAIL = require('../utils/utils');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -31,12 +32,6 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  User.findOne({ email: req.body.email })
-    .then((user) => {
-      if (!user) {
-        throw new ConflictError('Пользователь с данным email уже зарегистрирован');
-      }
-    });
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -60,6 +55,8 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestCode('Переданы некорректные данные'));
+      } else if (err.code === DUPLICATE_EMAIL) {
+        next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
       } else { next(err); }
     });
 };
