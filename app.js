@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const auth = require('./middlewares/auth');
@@ -43,8 +44,10 @@ app.use(auth);
 app.use('/cards', auth, cardRoutes);
 app.use('/users', auth, userRoutes);
 
+app.use(errors()); // обработчик ошибок celebrate
+
 app.use('/', (req, res, next) => {
-  next(new NotFoundError('Пользователь не найден'));
+  next(new NotFoundError('Нет такой страницы'));
 });
 
 app.use((err, req, res, next) => {
