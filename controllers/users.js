@@ -1,39 +1,43 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
 const User = require('../models/user');
-const {
-  ERROR_CODE,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-} = require('../utils/utils');
+const NotFoundError = require('../utils/NotFoundError');
+const BadRequestCode = require('../utils/BadRequestCode');
+const UnauthorizedError = require('../utils/UnauthorizedError');
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.find({})
     .then((user) => res.send(user))
-    .catch(() => {
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+    .catch((err) => {
+      next(err);
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserOne = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+        throw new NotFoundError('Пользователь не найден');
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.status).send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -56,16 +60,12 @@ module.exports.createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
-        return;
-      }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+        next(new BadRequestCode('Переданы некорректные данные'));
+      } else { next(err); }
     });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
@@ -74,16 +74,15 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
-        return;
+        next(new BadRequestCode('Переданы некорректные данные'));
       }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Пользователь не найден'));
+      } else { next(err); }
     });
 };
 
-module.exports.updateAvatarUser = (req, res) => {
+module.exports.updateAvatarUser = (req, res, next) => {
   const { avatar } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
@@ -92,16 +91,15 @@ module.exports.updateAvatarUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.status)
-          .send({ message: ERROR_CODE.message });
-        return;
+        next(new BadRequestCode('Переданы некорректные данные'));
       }
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Пользователь не найден'));
+      } else { next(err); }
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -112,17 +110,7 @@ module.exports.login = (req, res) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
-};
-
-module.exports.getUserOne = (req, res) => {
-  User.findById(req.user._id)
-    .then((user) => res.send({ data: user }))
     .catch(() => {
-      res.status(ERROR_DEFAULT.status).send({ message: ERROR_DEFAULT.message });
+      next(new UnauthorizedError('Ошибка аунтификации'));
     });
 };
