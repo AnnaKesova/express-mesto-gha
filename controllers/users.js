@@ -13,14 +13,6 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
-module.exports.getUserOne = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      next(err);
-    });
-};
-
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
@@ -96,6 +88,14 @@ module.exports.updateAvatarUser = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Пользователь не найден'));
       } else { next(err); }
+    });
+};
+
+module.exports.getUserOne = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      next(err);
     });
 };
 
