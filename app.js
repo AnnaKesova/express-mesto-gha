@@ -42,7 +42,15 @@ app.use(auth);
 
 // роуты, требующие авторизации
 app.use('/cards', auth, cardRoutes);
-app.use('/users', userRoutes);
+app.use('/users',celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email(),
+    password: Joi.string().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(/^(https|http)?:\/\/(www.)?[\w-._~:/?#[\]@!$&'()*+,;=]*#?/),
+  }),
+}), userRoutes);
 
 app.use(errors()); // обработчик ошибок celebrate
 
