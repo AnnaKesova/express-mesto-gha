@@ -10,7 +10,7 @@ cardRoutes.get('/', getCard);
 cardRoutes.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().max(30),
+    link: Joi.string().required().regex(/^(https|http)?:\/\/(www.)?[\w-._~:/?#[\]@!$&'()*+,;=]*#?/),
   }),
 }), createCard);
 cardRoutes.delete('/:cardId', celebrate({

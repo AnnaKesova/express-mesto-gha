@@ -8,7 +8,11 @@ const userRoutes = express.Router();
 
 userRoutes.get('/', getUser);
 userRoutes.get('/me', getUserOne);
-userRoutes.get('/:userId', getUserById);
+userRoutes.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().alphanum().length(24).hex(),
+  }),
+}), getUserById);
 userRoutes.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -17,7 +21,7 @@ userRoutes.patch('/me', celebrate({
 }), updateUser);
 userRoutes.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string(),
+    avatar: Joi.string().regex(/^(https|http)?:\/\/(www.)?[\w-._~:/?#[\]@!$&'()*+,;=]*#?/),
   }),
 }), updateAvatarUser);
 
