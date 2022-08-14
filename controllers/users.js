@@ -50,7 +50,7 @@ module.exports.createUser = (req, res, next) => {
           });
         })
         .catch((err) => {
-          if (err.code === 11000) {
+          if (err.code === DUPLICATE_EMAIL) {
             next(new ConflictError('Пользователь с таким email уже существует'));
             return;
           }
