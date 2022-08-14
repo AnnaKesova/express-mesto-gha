@@ -34,13 +34,17 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
-      } else {
-        res.send(card);
+        return;
       }
+      if (card.owner.toString() !== req.user._id) {
+        return;
+      }
+      Card.findByIdAndRemove(req.params.cardId)
+        .then(() => res.send(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {

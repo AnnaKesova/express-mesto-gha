@@ -18,23 +18,18 @@ const app = express();
 
 app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62e6e420eb16b4e44753a568',
-  };
-
-  next();
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/cards', cardRoutes);
-app.use('/users', userRoutes);
+// роуты, нетребующие авторизации
 app.post('/signin', login);
 app.post('/signup', createUser);
 // авторизация
 app.use(auth);
+
+// роуты, требующие авторизации
+app.use('/cards', auth, cardRoutes);
+app.use('/users', auth, userRoutes);
 
 app.use('/', (req, res) => {
   res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
