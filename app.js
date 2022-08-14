@@ -6,9 +6,7 @@ const { celebrate, Joi } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const {
-  ERROR_NOT_FOUND,
-} = require('./utils/utils');
+const NotFoundError = require('./utils/NotFoundError');
 const {
   createUser, login,
 } = require('./controllers/users');
@@ -45,8 +43,23 @@ app.use(auth);
 app.use('/cards', auth, cardRoutes);
 app.use('/users', auth, userRoutes);
 
-app.use('/', (req, res) => {
-  res.status(ERROR_NOT_FOUND.status).send({ message: ERROR_NOT_FOUND.message });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Пользователь не найден'));
+});
+
+app.use((err, req, res, next) => {
+  // если у ошибки нет статуса, выставляем 500
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      // проверяем статус и выставляем сообщение в зависимости от него
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
 });
 
 async function main() {
