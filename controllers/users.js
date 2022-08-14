@@ -20,9 +20,7 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => {
       if (user === null) {
         throw new NotFoundError('Пользователь не найден');
-      } else {
-        res.send({ data: user });
-      }
+      } return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
