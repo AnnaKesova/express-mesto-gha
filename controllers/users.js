@@ -4,7 +4,6 @@ const User = require('../models/user');
 const NotFoundError = require('../utils/NotFoundError');
 const BadRequestCode = require('../utils/BadRequestCode');
 const UnauthorizedError = require('../utils/UnauthorizedError');
-const CREATE_STATUS = require('../utils/utils');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -43,7 +42,7 @@ module.exports.createUser = (req, res, next) => {
       password: hash, // записываем хеш в базу
     }))
     .then((user) => {
-      res.status(CREATE_STATUS).send({
+      res.send({
         _id: user._id,
         name: user.name,
         about: user.about,
