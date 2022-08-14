@@ -51,14 +51,15 @@ module.exports.createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
+      if (err.code === DUPLICATE_EMAIL) {
+        next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(new BadRequestCode('Переданы некорректные данные'));
         return;
       }
-      if (err.code === DUPLICATE_EMAIL) {
-        next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
-        return;
-      } next(err);
+      next(err);
     });
 };
 
