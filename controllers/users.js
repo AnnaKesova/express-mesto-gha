@@ -55,7 +55,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'[404]));
+        next(new NotFoundError('Пользователь не найден'));
         return;
       }
       res.send({ data: user });
@@ -63,7 +63,8 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestCode('Переданы некорректные данные'));
-      } else { next(err); }
+        return;
+      } next(err);
     });
 };
 
