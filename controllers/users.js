@@ -53,9 +53,12 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestCode('Переданы некорректные данные'));
-      } else if (err.code === DUPLICATE_EMAIL) {
+        return;
+      }
+      if (err.code === DUPLICATE_EMAIL) {
         next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
-      } else { next(err); }
+        return;
+      } next(err);
     });
 };
 
