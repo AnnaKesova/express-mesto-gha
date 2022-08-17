@@ -28,7 +28,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new NotFoundError('Пользователь не найден');
       }
       if (card.owner.toString() !== req.user._id) { throw new ForbiddenError('Чужую карточку нельзя удалить'); }
-      Card.findByIdAndRemove(req.params.cardId)
+      return Card.findByIdAndRemove(req.params.cardId)
         .then(() => res.send(card));
     })
     .catch((err) => {

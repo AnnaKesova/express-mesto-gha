@@ -5,6 +5,7 @@ const NotFoundError = require('../utils/NotFoundError');
 const BadRequestCode = require('../utils/BadRequestCode');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 const ConflictError = require('../utils/ConflictError');
+const InternalServerError = require('../utils/InternalServerError');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -48,6 +49,9 @@ module.exports.createUser = (req, res, next) => {
           }
           next(err);
         });
+    })
+    .catch(() => {
+      next(new InternalServerError('Неожиданная ошибка'));
     });
 };
 
